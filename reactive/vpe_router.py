@@ -2,6 +2,7 @@
 from charmhelpers.core.hookenv import config
 from charmhelpers.core.hookenv import status_set
 from charmhelpers.core.hookenv import action_get
+from charmhelpers.core.hookenv import log
 
 from charms.reactive import hook
 from charms.reactive import when
@@ -66,6 +67,15 @@ def add_route():
     iface_name = action_get('iface_name')
     vlan_id = action_get('vlan_id')
     cidr = action_get('cidr')
+
+    missing = []
+    for item in [domain_name, iface_name, vlan_id, cidr]:
+        if not item:
+            missing.append(item)
+
+    if len(missing) > 0:
+        log('CRITICAL', 'Unable to complete operation due to missing required'
+            'param: {}'.format('item'))
 
     iface_vlanid = '%s.%s' % (iface_name, vlan_id)
 

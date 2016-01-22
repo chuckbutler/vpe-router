@@ -1,17 +1,11 @@
 
-from charmhelpers.core.hookenv import (
-    config,
-    status_set,
-    action_get,
-)
+from charmhelpers.core.hookenv import config
+from charmhelpers.core.hookenv import status_set
+from charmhelpers.core.hookenv import action_get
 
-from charms.reactive import (
-    hook,
-    set_state,
-    is_state,
-    remove_state,
-    main,
-)
+from charms.reactive import hook
+from charms.reactive import when
+
 
 from charms import router
 
@@ -21,7 +15,8 @@ cfg = config()
 
 @hook('install')
 def deps():
-    apt_install('some-stuff')
+    pass
+    # apt_install('some-stuff')
 
 
 @hook('config-changed')
@@ -49,22 +44,40 @@ def add_site():
     #  router.vlan_ns(ethN, vlan, site)
     router.ip('link', 'set', 'dev', link_name, 'netns', site)
     #  router.link_up_ns(site, link_name, cidr)
-    router.ip('netns', 'exec', site, 'ip', 'link', 'set', 'dev', link_name, 'up')
-    router.ip('netns', 'exec', site, 'ip', 'address', 'add', cidr, 'dev', link_name)
+    router.ip('netns', 'exec', site, 'ip', 'link', 'set', 'dev',
+              link_name, 'up')
+    router.ip('netns', 'exec', site, 'ip', 'address', 'add', cidr,
+              'dev', link_name)
 
 
-@when('vpe.add-route')
+@when('vpe.add_corporation')
 def add_route():
-    site = action_get('site')
-    name = action_get('name')
-    local_addr = action_get('address.local')
-    remote_addr = action_get('address.remote')
+    '''
+    Create and Activate the network corporation via the commands outlined
+    by 6wind
 
-    gre_name = '%s%s' % (site, name)
+    ip link add link iface_name name iface_name.vlan_id type vlan id vlan_id
+    ip link set dev iface_name.vlan_id netns domain_name
+    ip netns exec domain_name ip link set dev iface_name.vlan_id up
+    ip netns exec domain_name ip address add cidr dev iface_name.vlan_id
+    '''
 
-    router.ip('tunnel', 'add', gre_name, 'mode', 'gre', 'local', local_addr,
-              'remote', remote_addr, 'dev', iface, 'key', 1, 'csum')
-    router.ip('link', 'set', 'dev', gre_name, 'netns', site)
+    domain_name = action_get('domain_name')
+    iface_name = action_get('iface_name')
+    vlan_id = action_get('vlan_id')
+    cidr = action_get('cidr')
+
+    iface_vlanid = '%s.%s' % (iface_name, vlan_id)
+
+    status_set('maintenance', 'Adding corporation {}'.format(domain_name))
+
+    router.ip('link', 'add', 'link', iface_name, domain_name, vlan_id,
+              'type', 'vlan', 'id', vlan_id)
+    router.ip('link', 'set', 'dev', iface_vlanid, 'netns', domain_name)
+    router.ip('netns', 'exec', domain_name, 'ip', 'link', 'set', 'dev',
+              iface_vlanid, 'up')
+    router.ip('netns', 'exec', domain_name, 'ip', 'address', 'add', cidr,
+              'dev', iface_vlanid)
 
 
 @when('vpe.remove-site')

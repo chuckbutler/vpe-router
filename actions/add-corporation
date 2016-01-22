@@ -9,11 +9,11 @@ from charms.reactive import remove_state
 from charmhelpers.core.hookenv import action_fail
 
 
-set_state('vpe.add-route')
+set_state('vpe.add-corporation')
 
 try:
     main()
 except Exception as e:
     action_fail(repr(e))
 finally:
-    remove_state('vpe.add-route')
+    remove_state('vpe.add-corporation')

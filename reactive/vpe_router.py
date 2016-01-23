@@ -52,10 +52,10 @@ def add_site():
 
 
 @when('vpe.add_corporation')
-def add_route():
+def add_corporation():
     '''
-    Create and Activate the network corporation via the commands outlined
-    by 6wind
+    Create and Activate the network corporation via the commands
+    '''
 
     ip link add link iface_name name iface_name.vlan_id type vlan id vlan_id
     ip link set dev iface_name.vlan_id netns domain_name

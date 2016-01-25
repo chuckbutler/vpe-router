@@ -54,13 +54,7 @@ def add_site():
 @when('vpe.add_corporation')
 def add_corporation():
     '''
-    Create and Activate the network corporation via the commands
-    '''
-
-    ip link add link iface_name name iface_name.vlan_id type vlan id vlan_id
-    ip link set dev iface_name.vlan_id netns domain_name
-    ip netns exec domain_name ip link set dev iface_name.vlan_id up
-    ip netns exec domain_name ip address add cidr dev iface_name.vlan_id
+    Create and Activate the network corporation
     '''
 
     domain_name = action_get('domain_name')

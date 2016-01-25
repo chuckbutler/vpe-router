@@ -7,7 +7,6 @@ from charmhelpers.core.hookenv import log
 from charms.reactive import hook
 from charms.reactive import when
 
-
 from charms import router
 
 
@@ -51,7 +50,7 @@ def add_site():
               'dev', link_name)
 
 
-@when('vpe.add_corporation')
+@when('vpe.add-corporation')
 def add_corporation():
     '''
     Create and Activate the network corporation
